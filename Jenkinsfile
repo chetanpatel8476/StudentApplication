@@ -8,5 +8,11 @@ pipeline {
                 echo "clone the project successfully."
             }
         }
+        stage('Build the Project'){
+            steps{
+                sh 'mvn clean package'
+                echo "artifacts created successfully."
+            }
+        }
     }
 }
