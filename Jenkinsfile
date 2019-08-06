@@ -3,8 +3,10 @@ pipeline {
 
     stages {
         stage('Clone the Project'){
-            checkout scm
-            echo "clone the project successfully."
+            steps{
+                checkout scm
+                echo "clone the project successfully."
+            }
         }
     }
 }
