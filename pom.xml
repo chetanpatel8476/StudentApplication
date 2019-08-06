@@ -62,7 +62,7 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<finalName>student-service</finalName>
+		<finalName>vod-service</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
