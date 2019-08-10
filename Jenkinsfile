@@ -34,7 +34,7 @@ pipeline {
         }
         stage('Perform Quality Analysis'){
             steps{
-                sh 'mvn sonar:sonar -Dsonar.host.url=http://localhost:9000/sonar'
+                sh 'mvn sonar:sonar -Dsonar.host.url=http://localhost:9000'
                 echo "Performed code quality analysis and push reports to sonar server."
             }
         }
