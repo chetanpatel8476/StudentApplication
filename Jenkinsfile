@@ -10,7 +10,6 @@ pipeline {
         }
         stage('Build the Project'){
             steps{
-                sh 'mvn -B versions:set -DnewVersion=${pom.version}-${BUILD_NUMBER}'
                 sh 'mvn -B -Dmaven.test.skip=true clean package'
                 echo "artifacts created successfully."
             }
