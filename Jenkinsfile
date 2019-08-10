@@ -1,3 +1,5 @@
+def pom = readMavenPom file: 'pom.xml'
+
 pipeline {
     agent any
 
@@ -47,7 +49,6 @@ pipeline {
         }
         stage('Push artifacts to Nexus repository'){
             steps{
-                def pom = readMavenPom file: 'pom.xml'
                 nexusPublisher nexusInstanceId: 'localnexus3', nexusRepositoryId: 'student_application', packages: [[$class: 'MavenPackage', mavenAssetList: [[classifier: '', extension: '', filePath: '/var/lib/jenkins/workspace/Nexus-Example/target/student-service.war']], mavenCoordinate: [artifactId: 'student_application', groupId: 'com.einfochips.student', packaging: 'war', version: "${pom.version}-${BUILD_NUMBER}"]]]
             }
         }
