@@ -26,6 +26,12 @@ pipeline {
                 echo "Performed integration tests successfully."
             }
         }
+        stage('Generate Code Coverage Report'){
+            steps{
+                sh 'mvn test jacoco:report'
+                echo "Performed integration tests successfully."
+            }
+        }
         stage('Perform Quality Analysis'){
             steps{
                 sh 'mvn sonar:sonar -Dsonar.host.url=http://localhost:9000/sonar'

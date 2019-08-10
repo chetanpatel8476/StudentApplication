@@ -24,7 +24,6 @@
 		<surefireplugin.version>3.0.0-M3</surefireplugin.version>
 		<jacoco.version>0.8.2</jacoco.version>
 		<sonar.version>3.6.0.1398</sonar.version>
-		<sonar.junit.reportPaths>target/surefire-reports,target/failsafe-reports</sonar.junit.reportPaths>
 	</properties>
 
 	<dependencies>
@@ -118,21 +117,6 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>versions-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-failsafe-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<skip>${surefire.skip}</skip>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>${jacoco.version}</version>
@@ -144,23 +128,10 @@
 						</goals>
 					</execution>
 					<execution>
-						<id>default-prepare-agent-it</id>
-						<goals>
-							<goal>prepare-agent-integration</goal>
-						</goals>
-					</execution>
-					<execution>
 						<id>default-report</id>
 						<phase>prepare-package</phase>
 						<goals>
 							<goal>report</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>default-report-it</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>report-integration</goal>
 						</goals>
 					</execution>
 				</executions>
