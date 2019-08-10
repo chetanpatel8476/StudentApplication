@@ -68,14 +68,20 @@ public class StudentController {
 		return response;
 	}
 
-	@RequestMapping(value = "/student", method = RequestMethod.POST)
+	@RequestMapping(value = "/student", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public ResponseEntity<Student> createNewStudent(@RequestBody StudentDTO studentdto) {
 		ResponseEntity<Student> response = null;
 		try {
 			LOGGER.info("createNewStudent: request={}", studentdto);
-			if (studentdto != null) {
+			if (validateRequest(studentdto)) {
 				Student savedStudent = studentServiceImpl.create(studentdto);
-				response = new ResponseEntity<>(savedStudent, HttpStatus.CREATED);
+				if (savedStudent != null) {
+					response = new ResponseEntity<>(savedStudent, HttpStatus.CREATED);
+				} else {
+					response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+				}
+			} else {
+				response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			}
 		} catch (Exception exception) {
 			LOGGER.error("Exception in createNewStudent method: {}", exception);
@@ -85,16 +91,20 @@ public class StudentController {
 		return response;
 	}
 
-	@RequestMapping(value = "/student/{id}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/student/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public ResponseEntity<Student> updateStudentById(@PathVariable("id") int id, @RequestBody StudentDTO studentdto) {
 		ResponseEntity<Student> response = null;
 		try {
 			LOGGER.info("updateStudentById: request={}", studentdto);
 			if (studentdto != null) {
 				Student updatedStudent = studentServiceImpl.update(id, studentdto);
-				response = new ResponseEntity<>(updatedStudent, HttpStatus.OK);
+				if (updatedStudent != null) {
+					response = new ResponseEntity<>(updatedStudent, HttpStatus.OK);
+				} else {
+					response = new ResponseEntity<>(HttpStatus.NO_CONTENT);
+				}
 			} else {
-				response = new ResponseEntity<>(HttpStatus.NO_CONTENT);
+				response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			}
 		} catch (Exception exception) {
 			LOGGER.error("Exception in createNewStudent method: {}", exception);
@@ -103,7 +113,7 @@ public class StudentController {
 		LOGGER.info("updateStudentById: response={}", response);
 		return response;
 	}
-	
+
 	@RequestMapping(value = "/student/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity<Student> deleteStudentById(@PathVariable("id") int id) {
 		ResponseEntity<Student> response = null;
@@ -121,6 +131,15 @@ public class StudentController {
 		}
 		LOGGER.info("deleteStudentById: response={}", response);
 		return response;
+	}
+
+	public boolean validateRequest(StudentDTO studentDTO) {
+		if (studentDTO.getFirstName() != null && studentDTO.getLastName() != null && studentDTO.getEmail() != null
+				&& studentDTO.getPhoneNumber() != null)
+			return true;
+		else {
+			return false;
+		}
 	}
 
 }

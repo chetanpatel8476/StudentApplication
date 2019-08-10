@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+
+	<tbl_student_info id="1" fname="Chetan" lname="Patel"
+		email="cpatel@arlo.com" phone_number="8488061078"></tbl_student_info>
+
+	<tbl_student_info id="2" fname="Chintan" lname="Patel"
+		email="cpatel2@arlo.com" phone_number="8141346574"></tbl_student_info>
+
+</dataset>

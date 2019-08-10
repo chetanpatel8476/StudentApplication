@@ -2,19 +2,10 @@ package com.einfochips.student.dto;
 
 public class StudentDTO {
 
-	private Integer id;
 	private String firstName;
 	private String lastName;
 	private String email;
 	private Long phoneNumber;
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
 
 	public String getFirstName() {
 		return firstName;
@@ -51,9 +42,8 @@ public class StudentDTO {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("StudentDTO [id=").append(id).append(", firstName=").append(firstName).append(", lastName=")
-				.append(lastName).append(", email=").append(email).append(", phoneNumber=").append(phoneNumber)
-				.append("]");
+		builder.append("StudentDTO [firstName=").append(firstName).append(", lastName=").append(lastName)
+				.append(", email=").append(email).append(", phoneNumber=").append(phoneNumber).append("]");
 		return builder.toString();
 	}
 

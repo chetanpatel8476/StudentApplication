@@ -38,8 +38,11 @@ public class StudentServiceImpl implements StundentService {
 			student.setLastName(studentdto.getLastName());
 			student.setEmail(studentdto.getEmail());
 			student.setPhoneNumber(studentdto.getPhoneNumber());
+
+			return studentRepository.saveAndFlush(student);
+		} else {
+			return student;
 		}
-		return studentRepository.saveAndFlush(student);
 	}
 
 	@Override

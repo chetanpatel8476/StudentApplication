@@ -10,8 +10,31 @@ pipeline {
         }
         stage('Build the Project'){
             steps{
-                sh 'mvn clean package'
+                sh 'mvn -B -Dmaven.test.skip=true clean package'
                 echo "artifacts created successfully."
+            }
+        }
+        stage('Execute Unit Tests'){
+            steps{
+                sh 'mvn -B clean test'
+                echo "Performed unit tests successfully."
+            }
+        }
+        stage('Execute Integration Tests'){
+            steps{
+                sh 'mvn -B clean verify -Dsurefire.skip=true'
+                echo "Performed integration tests successfully."
+            }
+        }
+        stage('Perform Quality Analysis'){
+            steps{
+                sh 'mvn sonar:sonar -Dsonar.host.url=http://localhost:9000/sonar -DskipTests'
+                echo "Performed code quality analysis and push reports to sonar server."
+            }
+        }
+        stage('Approval'){
+            timeout(time:3, unit:'DAYS'){
+                input 'Do I have your approval for deployment?'
             }
         }
         stage('Push artifacts to Nexus repository'){
