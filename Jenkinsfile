@@ -33,8 +33,10 @@ pipeline {
             }
         }
         stage('Approval'){
-            timeout(time:3, unit:'DAYS'){
-                input 'Do I have your approval for deployment?'
+            steps{
+                timeout(time:3, unit:'DAYS'){
+                    input 'Do I have your approval for deployment?'
+                } 
             }
         }
         stage('Push artifacts to Nexus repository'){
