@@ -1,0 +1,46 @@
+-
+  name: CI/CD Pipeline (Build the latest war file and deploy into tomcat server)
+  hosts: localhost
+  gather_facts: False
+  become: true
+  vars:
+     nexus_version: "{{ nexus_build }}"
+  tasks:
+    - name: Stop the tomcat8
+      systemd:
+         name: tomcat8
+         state: stopped
+      become: true
+      become_method: sudo
+
+    - name: Download war file from the repository
+      get_url:
+         url: http://localhost:8081/repository/student_application/com/einfochips/student/student-service/{{ nexus_version }}/student-service-{{ nexus_version }}.war
+         dest: /home/einfochips/Desktop/Student-Application/artifacts
+
+    - name: Change war file name
+      command: mv /home/einfochips/Desktop/Student-Application/artifacts/student-service-{{ nexus_version }}.war /home/einfochips/Desktop/Student-Application/artifacts/student-service.war
+
+    - name: Remove the exists backup file before taking backup for existing war file
+      file:
+         path: /home/einfochips/Desktop/Student-Application/artifacts/war_bkp/student-service.war
+         state: absent
+
+    - name: Check war file exists or not in tomcat webapps before replace it
+      stat: 
+         path: /opt/tomcat8/webapps/student-service.war
+      register: war_stat
+
+    - name: Backup the existing war file
+      command: mv /opt/tomcat8/webapps/student-service.war /tmp/war_bkp
+      when: war_stat.stat.exists
+
+    - name: Copy the latest downloaded war file into tomcat
+      command: mv /home/einfochips/Desktop/Student-Application/artifacts/student-service.war /opt/tomcat8/webapps
+
+    - name: Start the tomcat8
+      systemd:
+         name: tomcat8
+         state: started
+      become: true
+      become_method: sudo
