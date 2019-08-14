@@ -1,5 +1,5 @@
 -
-  name: CI/CD Pipeline (Build the latest war file and deploy into tomcat server)
+  name: CI/CD Pipeline (Build the latest war file and deploy into web servers)
   hosts: localhost
   gather_facts: False
   become: true
@@ -23,7 +23,7 @@
 
     - name: Remove the exists backup file before taking backup for existing war file
       file:
-         path: /home/einfochips/Desktop/Student-Application/artifacts/war_bkp/student-service.war
+         path: /home/einfochips/Desktop/Student-Application/war_bkp/student-service.war
          state: absent
 
     - name: Check war file exists or not in tomcat webapps before replace it
@@ -32,7 +32,7 @@
       register: war_stat
 
     - name: Backup the existing war file
-      command: mv /opt/tomcat8/webapps/student-service.war /tmp/war_bkp
+      command: mv /opt/tomcat8/webapps/student-service.war /home/einfochips/Desktop/Student-Application/war_bkp
       when: war_stat.stat.exists
 
     - name: Copy the latest downloaded war file into tomcat
