@@ -6,7 +6,7 @@ pipeline {
             steps{
                 slackSend channel: '#jenkins', 
                     color: 'good', 
-                    message: "New code is available on github. Now started to clone the latest code. %date% %time%", 
+                    message: "New code is available on github. Now started to clone the latest code.", 
                     tokenCredentialId: 'Slack_Token'
                 checkout scm
                 echo "clone the project successfully."
