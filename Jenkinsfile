@@ -13,20 +13,6 @@ pipeline {
             }
         }
 
-        stage('Execute Unit Tests and Generate Code Coverage Report'){
-            steps{
-                sh 'mvn -B clean test jacoco:report'
-                echo "Performed unit tests successfully."
-            }
-        }
-
-        stage('Perform Code Quality Gates'){
-            steps{
-                sh 'mvn sonar:sonar -Dsonar.host.url=http://localhost:9000'
-                echo "Performed code quality analysis and push reports to sonar server."
-            }
-        }
-        
         stage('Approval for Build the Artifacts'){
             steps{
                 timeout(time:3, unit:'DAYS'){
