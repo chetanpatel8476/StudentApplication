@@ -8,11 +8,25 @@ pipeline {
                     color: 'good', 
                     message: "New code is available on github. Now started to clone the latest code.", 
                     tokenCredentialId: 'Slack_Token'
-                checkout scm
+                git credentialsId: 'Github Credentials', url: 'https://github.com/chetanpatel8476/StudentApplication.git'
                 echo "clone the project successfully."
             }
         }
 
+        stage('Execute Unit Tests and Generate Code Coverage Report'){
+            steps{
+                sh 'mvn -B clean test jacoco:report'
+                echo "Performed unit tests successfully."   
+            }
+        }
+
+        stage('Perform Code Quality Analysis'){
+            steps{
+                sh 'mvn sonar:sonar -Dsonar.host.url=http://localhost:9000/sonar'
+                echo "Performed code quality analysis and push reports to sonar server."
+            }
+        }
+        
         stage('Approval for Build the Artifacts'){
             steps{
                 timeout(time:3, unit:'DAYS'){
@@ -24,7 +38,6 @@ pipeline {
         stage('Build the Project'){
             steps{
                 sh 'mvn -B -Dmaven.test.skip=true package'
-                echo "artifacts created successfully."
             }
             
             post{
@@ -58,6 +71,22 @@ pipeline {
                         version: "${pom.version}-${BUILD_NUMBER}"]]]
                 }
             }
+            
+            post{
+                success{
+                    slackSend channel: '#jenkins', 
+                            color: 'good', 
+                            message: "Artifacts uploaded successfully for *Build Number* : *${env.BUILD_NUMBER}*", 
+                            tokenCredentialId: 'Slack_Token'
+                }
+                
+                failure{
+                    slackSend channel: '#jenkins', 
+                            color: 'danger', 
+                            message: "Artifacts failed to uploading for *Build Number* : *${env.BUILD_NUMBER}*", 
+                            tokenCredentialId: 'Slack_Token'
+                }
+            }
         }
         
         stage('Approval for Deployment'){
@@ -72,7 +101,7 @@ pipeline {
             steps{
                 slackSend channel: '#jenkins', 
                     color: 'good', 
-                    message: "Deployment is *started* on for build: *${BUILD_NUMBER}*", 
+                    message: "Deployment is *started* on for *Build Number* : *${BUILD_NUMBER}*", 
                     tokenCredentialId: 'Slack_Token' 
             }
         }
@@ -82,25 +111,28 @@ pipeline {
                 script{
                     def pom = readMavenPom file: 'pom.xml'
                     ansiblePlaybook extras: "--extra-vars nexus_build=${pom.version}-${BUILD_NUMBER}", 
-                        playbook: 'student-application.yml'
+                        inventory: '/home/einfochips/Desktop/Ansible Demo/Student/hosts', 
+                        playbook: '/home/einfochips/Desktop/Ansible Demo/Student/playbook.yml'
                 }
             }
             
             post {
-                success {
-                    slackSend channel: '#jenkins', 
-                        color: 'good', 
-                        message: "Deployment is *completed* %date% %time% for build: *${BUILD_NUMBER}*", 
-                        tokenCredentialId: 'Slack_Token'
-                }
-            
                 failure {
                     slackSend channel: '#jenkins', 
                         color: 'danger', 
-                        message: "Deployment is *failed* %date% %time% for build: *${BUILD_NUMBER}*", 
+                        message: "Deployment is *failed* for *Build Number*: *${env.BUILD_NUMBER}*", 
                         tokenCredentialId: 'Slack_Token'
                }
            }
+        }
+        
+        stage('Completed the Deployment'){
+            steps{
+                slackSend channel: '#jenkins', 
+                    color: 'good', 
+                    message: "Deployment is *completed* for *Build Number*: *${env.BUILD_NUMBER}*", 
+                    tokenCredentialId: 'Slack_Token'
+            }
         }
     }
 }

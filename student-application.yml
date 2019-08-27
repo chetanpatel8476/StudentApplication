@@ -1,29 +1,29 @@
 -
   name: CI/CD Pipeline (Build the latest war file and deploy into web servers)
-  hosts: localhost
+  hosts: webserver
   gather_facts: False
   become: true
   vars:
      nexus_version: "{{ nexus_build }}"
   tasks:
-    - name: Stop the tomcat8
-      systemd:
+    - name: Stop the tomcat8 service
+      service: 
          name: tomcat8
-         state: stopped
-      become: true
-      become_method: sudo
+         state: stopped 
 
     - name: Download war file from the repository
       get_url:
-         url: http://localhost:8081/repository/student_application/com/einfochips/student/student-service/{{ nexus_version }}/student-service-{{ nexus_version }}.war
-         dest: /home/einfochips/Desktop/Student-Application/artifacts
+         url: http://3.10.24.36:8081/repository/student_application/com/einfochips/student/student-service/{{ nexus_version }}/student-service-{{ nexus_version }}.war
+         dest: ${HOME}/Student-Application/artifacts
+         url_username: admin
+         url_password: admin
 
     - name: Change war file name
-      command: mv /home/einfochips/Desktop/Student-Application/artifacts/student-service-{{ nexus_version }}.war /home/einfochips/Desktop/Student-Application/artifacts/student-service.war
+      command: mv ${HOME}/Student-Application/artifacts/student-service-{{ nexus_version }}.war ${HOME}/Student-Application/artifacts/student-service.war
 
     - name: Remove the exists backup file before taking backup for existing war file
       file:
-         path: /home/einfochips/Desktop/Student-Application/war_bkp/student-service.war
+         path: ${HOME}/Student-Application/war_bkp/student-service.war
          state: absent
 
     - name: Check war file exists or not in tomcat webapps before replace it
@@ -32,15 +32,42 @@
       register: war_stat
 
     - name: Backup the existing war file
-      command: mv /opt/tomcat8/webapps/student-service.war /home/einfochips/Desktop/Student-Application/war_bkp
+      command: mv /opt/tomcat8/webapps/student-service.war ${HOME}/Student-Application/war_bkp
       when: war_stat.stat.exists
 
     - name: Copy the latest downloaded war file into tomcat
-      command: mv /home/einfochips/Desktop/Student-Application/artifacts/student-service.war /opt/tomcat8/webapps
+      command: mv ${HOME}/Student-Application/artifacts/student-service.war /opt/tomcat8/webapps
 
-    - name: Start the tomcat8
-      systemd:
+    - name: Check appd agents directory exists or not
+      stat:
+         path: /opt/appdynamics
+      register: appd_stat
+
+    - name: Download script for appd agent installation
+      get_url:
+         url: https://appd-agents.s3-eu-west-1.amazonaws.com/my-app/appd-agents.sh
+         dest: ${HOME}/Student-Application
+      when: appd_stat.stat.exists == False
+
+    - name: Change file permission
+      file: 
+         dest: ${HOME}/Student-Application/appd-agents.sh 
+         mode: a+x
+      when: appd_stat.stat.exists == False
+
+    - name: Run appd-agent script
+      shell: ${HOME}/Student-Application/appd-agents.sh
+      args:
+        executable: /bin/sh
+      when: appd_stat.stat.exists == False
+
+    - name: Start the machineagent service
+      service:
+         name: machineagent
+         state: started
+      when: appd_stat.stat.exists == False
+
+    - name: Start the tomcat8 service
+      service: 
          name: tomcat8
          state: started
-      become: true
-      become_method: sudo
