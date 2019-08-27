@@ -8,7 +8,7 @@ pipeline {
                     color: 'good', 
                     message: "New code is available on github. Now started to clone the latest code.", 
                     tokenCredentialId: 'Slack_Token'
-                git credentialsId: 'Github Credentials', url: 'https://github.com/chetanpatel8476/StudentApplication.git'
+                checkout scm
                 echo "clone the project successfully."
             }
         }
