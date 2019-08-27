@@ -111,8 +111,8 @@ pipeline {
                 script{
                     def pom = readMavenPom file: 'pom.xml'
                     ansiblePlaybook extras: "--extra-vars nexus_build=${pom.version}-${BUILD_NUMBER}", 
-                        inventory: '/home/einfochips/Desktop/Ansible Demo/Student/hosts', 
-                        playbook: '/home/einfochips/Desktop/Ansible Demo/Student/playbook.yml'
+                        inventory: 'hosts', 
+                        playbook: 'student-application.yml'
                 }
             }
             
