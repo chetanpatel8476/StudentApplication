@@ -57,6 +57,15 @@ pipeline {
             }
         }
 
+        stage('Updaloading the Artifacts'){
+            steps{
+                slackSend channel: '#jenkins',
+                        color: 'good',
+                        message: "Uploading the Artifacts for *Build Number* : *${env.BUILD_NUMBER}*",
+                        tokenCredentialId: 'Slack_Token'
+            }
+        }
+
         stage('Push artifacts to Nexus repository'){
             steps{
                 script{
@@ -73,19 +82,21 @@ pipeline {
             }
             
             post{
-                success{
-                    slackSend channel: '#jenkins', 
-                            color: 'good', 
-                            message: "Artifacts uploaded successfully for *Build Number* : *${env.BUILD_NUMBER}*", 
-                            tokenCredentialId: 'Slack_Token'
-                }
-                
                 failure{
                     slackSend channel: '#jenkins', 
                             color: 'danger', 
                             message: "Artifacts failed to uploading for *Build Number* : *${env.BUILD_NUMBER}*", 
                             tokenCredentialId: 'Slack_Token'
                 }
+            }
+        }
+
+        stage('Artifacts uploaded successfully'){
+            steps{
+                slackSend channel: '#jenkins',
+                        color: 'good',
+                        message: "Artifacts uploaded successfully for *Build Number* : *${env.BUILD_NUMBER}*",
+                        tokenCredentialId: 'Slack_Token'
             }
         }
         
